@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
 
 
 struct Word {
@@ -14,13 +14,14 @@ struct Word {
 
     Word(const std::vector<std::string>& words){
         xPos = 10.f;
-        yPos = rand()%(550-100+1)+100;
+        yPos = rand()%(600-100+1)+100;
         string = getRandomWord(words);
     }
 
-    void update(float timer){
+    void update(float& timer, int& lives){
         if(xPos > 1300){
             onScreen = false;
+            --lives;
         } else{
             xPos += 150.0f * timer;
         }
@@ -30,13 +31,19 @@ struct Word {
         word.setCharacterSize(18);
         word.setString(string);
         word.setFont(font);
-        word.setFillColor(sf::Color::Yellow);
+        word.setFillColor(sf::Color(20,250,250));
         word.setPosition({xPos,yPos});
+
+        word.setOutlineColor(sf::Color::Cyan);
         window.draw(word);
     }
 
-    void setColor(sf::Color color){
-        word.setFillColor(color);
+    void changeColorOnUse(std::string& input){
+        if((this->string).substr(0, input.size()) == input && input.size() != 0){
+            this->word.setOutlineThickness(1);
+        } else{
+            this->word.setOutlineThickness(0);
+        }
     }
 
     auto getRandomWord(const std::vector<std::string>& words) -> std::string;
