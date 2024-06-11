@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 
 struct Word {
@@ -13,7 +12,7 @@ struct Word {
 
 
     Word(const std::vector<std::string>& words){
-        xPos = 10.f;
+        xPos = -50.f;
         yPos = rand()%(600-100+1)+100;
         string = getRandomWord(words);
     }
@@ -23,7 +22,7 @@ struct Word {
             onScreen = false;
             --lives;
         } else{
-            xPos += 150.0f * timer;
+            xPos += 120.0f * timer;
         }
     }
 

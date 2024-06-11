@@ -6,6 +6,7 @@ diligent
 enormous
 freedom
 habitat
+minecraft
 illusion
 justice
 kitchen
@@ -38,6 +39,7 @@ liberty
 machine
 numeric
 observe
+unothodox
 picture
 quantum
 reality

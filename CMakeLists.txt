@@ -17,5 +17,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SFML)
 
-add_executable(MonkeyTyperCPP main.cpp word.cpp word.h)
+add_executable(MonkeyTyperCPP main.cpp word.cpp word.h
+)
 target_link_libraries(MonkeyTyperCPP fmt sfml-graphics)

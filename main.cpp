@@ -18,6 +18,26 @@ std::vector<std::string> getWords(const std::string& fname){
     return words;
 }
 
+std::vector<int> getResults(const std::string& fname){
+    std::vector<int> results;
+    std::ifstream file(fname);
+
+    int temp;
+    if(file){
+        while(file >> temp)
+            results.push_back(temp);
+    }
+    return results;
+}
+
+void writeResults(const std::string& fname, const std::vector<int>& results){
+    std::ofstream file(fname);
+    if(file){
+        for(auto result : results){
+            file << result << std::endl;
+        }
+    }
+}
 
 auto main() -> int{
     srand(time(NULL));
@@ -54,6 +74,14 @@ auto main() -> int{
     livesText.setFont(arialFont);
     livesText.setCharacterSize(24);
 
+    enum Difficulty{
+        easy,
+        medium,
+        hard
+    };
+
+    int difficulty = Difficulty::medium;
+
     int score = 0;
 
     sf::Text countWordsText;
@@ -67,6 +95,15 @@ auto main() -> int{
     wpmText.setFillColor(sf::Color::Cyan);
     wpmText.setFont(arialFont);
     wpmText.setCharacterSize(24);
+
+    std::vector<int> results = getResults("../results.txt");
+    sf::Text bestResult;
+    bestResult.setPosition(1000,650);
+    bestResult.setFillColor(sf::Color(100,100,100));
+    bestResult.setFont(arialFont);
+    bestResult.setCharacterSize(30);
+    bestResult.setString("Best Score: "+ std::to_string(results[1]));
+
 
     std::string input;
     sf::Text inputText;
@@ -86,8 +123,9 @@ auto main() -> int{
     playButton.setString("PLAY");
     playButton.setFont(arialFont);
     playButton.setCharacterSize(50);
-    playButton.setPosition(575,300);
+    playButton.setPosition(575,280);
     playButton.setFillColor(sf::Color(0,220,220));
+
 
     sf::Text difficultyText;
     difficultyText.setString("Difficulty:");
@@ -197,6 +235,7 @@ auto main() -> int{
                     if (goToMainMenu.getGlobalBounds().contains(mousePosF ) && !isRunning && !showMenu) {
                         isRunning = false;
                         showMenu = true;
+                        bestResult.setString("Best Score: " + std::to_string(results[difficulty]));
                     } else if( playButton.getGlobalBounds().contains(mousePosF) && showMenu) {
                         activeWords.clear();
                         score = 0;
@@ -205,24 +244,30 @@ auto main() -> int{
                         isRunning = true;
                         showMenu = false;
                         clock.restart();
+                    }else if(easyButton.getGlobalBounds().contains(mousePosF) && showMenu){
+                        words.clear();
+                        words = getWords("../easy.txt");
+                        easyButton.setOutlineThickness(2);
+                        mediumButton.setOutlineThickness(0);
+                        hardButton.setOutlineThickness(0);
+                        bestResult.setString("Best Score: " + std::to_string(results[0]));
+                        difficulty = easy;
                     } else if(mediumButton.getGlobalBounds().contains(mousePosF) && showMenu){
                         words.clear();
                         words = getWords("../medium.txt");
-                        mediumButton.setOutlineThickness(2);
                         easyButton.setOutlineThickness(0);
+                        mediumButton.setOutlineThickness(2);
                         hardButton.setOutlineThickness(0);
-                    } else if(easyButton.getGlobalBounds().contains(mousePosF) && showMenu){
-                        words.clear();
-                        words = getWords("../easy.txt");
-                        mediumButton.setOutlineThickness(0);
-                        easyButton.setOutlineThickness(2);
-                        hardButton.setOutlineThickness(0);
+                        bestResult.setString("Best Score: " + std::to_string(results[1]));
+                        difficulty = medium;
                     } else if(hardButton.getGlobalBounds().contains(mousePosF) && showMenu){
                         words.clear();
                         words = getWords("../hard.txt");
-                        mediumButton.setOutlineThickness(0);
                         easyButton.setOutlineThickness(0);
+                        mediumButton.setOutlineThickness(0);
                         hardButton.setOutlineThickness(2);
+                        bestResult.setString("Best Score: " + std::to_string(results[2]));
+                        difficulty = hard;
                     } else if(comicButton.getGlobalBounds().contains(mousePosF) && showMenu) {
                         defaultFont = comicFont;
                         comicButton.setOutlineThickness(2);
@@ -264,6 +309,7 @@ auto main() -> int{
             window.draw(arialButton);
             window.draw(hardButton);
             window.draw(witcherButton);
+            window.draw(bestResult);
         }
 
         if(lives == 0 && !showMenu){
@@ -277,6 +323,14 @@ auto main() -> int{
             window.clear(sf::Color::Black);
             window.draw(gameOver);
             window.draw(goToMainMenu);
+
+
+            if(score > results[difficulty]){
+                results[difficulty] = score;
+            }
+            writeResults("../results.txt", results);
+            bestResult.setString("Best Score: " + std::to_string(results[difficulty]));
+            window.draw(bestResult);
         }
 
         if (isRunning && !showMenu){
@@ -297,7 +351,6 @@ auto main() -> int{
             for(auto& word : activeWords){
                 word.update(timer, lives);
             }
-
 
 
             auto it = activeWords.begin();
@@ -327,6 +380,11 @@ auto main() -> int{
         }
         window.display();
     }
+
+    if(score > results[difficulty]){
+        results[difficulty] = score;
+    }
+    writeResults("../results.txt", results);
 
     return EXIT_SUCCESS;
 }
