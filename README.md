@@ -1,1 +1,1 @@
-Project for studing C++ in university
+Project for studing C++
